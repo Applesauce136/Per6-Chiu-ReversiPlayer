@@ -6,6 +6,7 @@ That game where you put tiles on the board and flip the ones between your tiles 
 Compile and run Driver_Othello.java in order to play the current prototype of the game.  This may not be the driver in the future!  Check back later.
 
 Status:
+
 -2P version of the game is operational
 
 -AI is not
