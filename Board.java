@@ -2,46 +2,27 @@
 
 import java.util.Arrays;
 
-public class Board implements Comparable<Board>
+public class Board
 {
     
-    private int
+    private final int
 	rows,
-	cols,
-	
-	player,
-	score;
-    
+	cols;
+
     //Each player's played tiles.
     private final BitBoard
 	p1,
 	p2;
     
-    //The previous move.
-    private Move last;
-    
-    //chars used in the toString() method.
-    public static char
-	p1Char = 'X',
-	p2Char = 'O',
-	spaceChar = '_';
-    
-    private Board[] valids;
-    
     //CONSTRUCTORS
     //----------------------------------------------------------------
-    
-    //FIRST BOARD
-    //--------------------------------
-    
+
     public Board(int rows, int cols)
     {
-	this.player = 1;
 	this.rows = rows;
 	this.cols = cols;
 	p1 = new BitBoard(rows, cols);
 	p2 = new BitBoard(rows, cols);
-	last = null;
     }
     
     public Board(int side)
@@ -59,77 +40,18 @@ public class Board implements Comparable<Board>
 	//These flips initiate a standard Reversi game.
 	//p1 gets the top-right corner of the 2x2 box.
     }
-    
-    //================================
-    
-    //RECURSIVE BOARD
-    //--------------------------------
-    
-    public Board(Board old, Move last)
-    {
-	this.rows = old.getRows();
-	this.cols = old.getCols();
-	this.player = old.getPlayer();
-	this.p1 = old.p1.clone();
-	this.p2 = old.p2.clone();
-	this.last = last;
-	this.play(last);
-    }
-    
-    //================================
-    
-    public void init()
-    {
-	initValids();
-	initScore();
-    }
-
-    public void initValids()
-    {
-	Board[] raw = new Board[getRows() * getCols()];
-	int index = 0;
-	for (int row = 0; row < getRows(); row++)
-	    {
-		for (int col = 0; col < getCols(); col++)
-		    {
-			if (check(row, col))
-			    {
-				raw[index++] = new Board(this, new Move(row, col));
-			    }
-		    }
-	    }
-	
-	valids = new Board[index--];
-	for (; index >= 0; index--)
-	    {
-		valids[index] = raw[index];
-	    }
-    }
 
     //================================================================
     
-    //IN DEVELOPMENT
+    //MAIN STUFF
     //----------------------------------------------------------------
-    
-    public int check(Move move)
-    {
-	init();
-	for (int index = 0; index < valids.length; index++)
-	    {
-		if (valids[index].getLast().equals(move))
-		    {
-			return index;
-		    }
-	    }
-	return -1;
-    }
-    
+
     //CHECK
     //--------------------------------
     
-    private boolean check(int row, int col)
+    private boolean check(int player, int row, int col)
     {
-	switch (getPlayer())
+	switch (player)
 	    {
 	    case 1:  return check(p1, p2, row, col);
 	    case 2:  return check(p2, p1, row, col);
@@ -173,19 +95,9 @@ public class Board implements Comparable<Board>
     //PLAY
     //--------------------------------
     
-    public Board play(int index)
+    private void play(int player, int row, int col)
     {
-	return valids[index];
-    }
-    
-    private void play(Move move)
-    {
-	play(move.row(), move.col());
-    }
-    
-    private void play(int row, int col)
-    {
-	switch (getPlayer())
+	switch (player)
 	    {
 	    case 1:  play(p1, p2, row, col); break;
 	    case 2:  play(p2, p1, row, col); break;
@@ -204,7 +116,6 @@ public class Board implements Comparable<Board>
 		    }
 	    }
 	act.flipAt(row, col);
-	player = otherPlayer(player);
     }
     
     private void play(BitBoard act, BitBoard pas, int row, int col, int drow, int dcol)
@@ -228,6 +139,11 @@ public class Board implements Comparable<Board>
     public int getRows() { return rows; }
     public int getCols() { return cols; }
     
+    public BitBoard clone()
+    {
+	return (BitBoard)this.clone();
+    }
+
     private boolean empty(int row, int col)
     {
 	return !( p1.getAt(row, col) || 
@@ -245,71 +161,15 @@ public class Board implements Comparable<Board>
 	return (0 <= row && row < getRows() &&
 		0 <= col && col < getCols());
     }
-    
-    public Move getLast()
-    {
-	return last;
-    }
 
-    //PLAYER INFO
-    //--------------------------------
-    
-    public int getPlayer()
-    {
-	return player;
-    }
-    
-    public static int otherPlayer(int player)
-    {
-	return 3 - player;
-    }
-    
-    public static int playerSign(int player)
-    //p1's sign is -, p2's sign is +
-    {
-	return 2 * player - 3;
-    }
-    //================================
-    
     //================================================================
-    
-    //SCORING
+
+    //TOSTRING
     //----------------------------------------------------------------
 
-    public int score()
-    {
-	return score;
-    }
-
-    public void initScore()
-    {
-	score = 0;
-	score += winning();
-    }
-
-    public int compareTo(Board other)
-    {
-	return other.score() - this.score();
-    }    
-
-    public int winning()
-    // output < 0 means p1 is winning, output > 0 means p2 is winning, output == 0 means tie
-    {
-	return p2.cardinality() - p1.cardinality();
-    }
-    
-    public boolean isFull()
-    {
-	BitBoard union = (BitBoard)p1.clone();
-	union.or(p2);
-	return union.cardinality() == union.size();
-    }
-    
-    //================================================================
-    
     public String toString()
     {
-	String output = getLast() + " <" + score + ">\n";
+	String output = "";
 	for (int row = -1; row < p1.getRows(); row++)
 	    //The -1 permits a top-row for indices
 	    {
@@ -320,17 +180,9 @@ public class Board implements Comparable<Board>
 		for (int col = 0; col < p1.getCols(); col++)
 		    {
 			if (row == -1) output += col; //or, if in first pass, add the index
-			
-			else if (p1.getAt(row, col) && p2.getAt(row, col))
-			    {
-				//this should never happen
-				System.out.println("TILE OVERFLOWED; CONTACT ADMINISTRATOR");
-				System.exit(1);
-			    }
-			
-			else if (p1.getAt(row, col)) output += p1Char;
-			else if (p2.getAt(row, col)) output += p2Char;
-			else                         output += spaceChar;
+			else if (p1.getAt(row, col)) output += 'X';
+			else if (p2.getAt(row, col)) output += 'O';
+			else                         output += '_';
 			
 			output += ' '; //space between tiles
 		    }
@@ -338,34 +190,6 @@ public class Board implements Comparable<Board>
 	    }
 	return output;
     }
-    
-}
 
-class Move
-{
-    
-    private final int
-	row,
-	col;
-    
-    public Move(int row, int col)
-    {
-	this.row = row;
-	this.col = col;
-    }
-    
-    public int row() { return row; }
-    public int col() { return col; }
-    
-    public boolean equals(Move other)
-    {
-	return (this.row() == other.row() &&
-		this.col() == other.col() );
-    }
-
-    public String toString()
-    {
-	return String.format("(%d, %d)", row, col);
-    }
-    
+    //================================================================
 }
