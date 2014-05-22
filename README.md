@@ -7,5 +7,7 @@ Compile and run Driver_Othello.java in order to play the current prototype of th
 
 Status:
 -2P version of the game is operational
+
 -AI is not
+
 -Board predetermines all possible moves rather than checking them as they're requested -- important step in AI development
