@@ -52,11 +52,11 @@ public class BitBoard extends BitSet
 	    }
     }
 
-    public void flipAt(int row, int col)
+    public void setAt(int row, int col, boolean value)
     {
 	if ( inBounds(row, col) )
 	    {
-		flip( lineify(row, col) );
+		set( lineify(row, col), value );
 		//lineify converts a coordinate pair into an index (see below)
 	    }
 	else
@@ -65,6 +65,12 @@ public class BitBoard extends BitSet
 	    }
     }
     //for the record, I know for a FACT that Lisp macros would make this so much nicer
+
+    public void setAt(int row, int col)
+    {
+	setAt(row, col, true);
+    }
+
     //================================================================
 
     //HELPER FUNCTIONS

@@ -1,18 +1,17 @@
 // -*-Java-*-
 
-public class BoardNode
+public class Node
 {
+    //The thing that this class actually wraps around.
+    private Board board;
 
     private int	
-	player,
-	score;
+	player;
 
-    private BoardNode[] children;
+    private Node[] children;
     
     //The previous move.
     private Move last;
-
-    private Board board;
     
     //SCORING
     //----------------------------------------------------------------
@@ -20,23 +19,6 @@ public class BoardNode
     public int score()
     {
 	return score;
-    }
-
-    public void initScore()
-    {
-	score = 0;
-	score += winning();
-    }
-
-    public int compareTo(Board other)
-    {
-	return other.score() - this.score();
-    }    
-
-    public int winning()
-    // output < 0 means p1 is winning, output > 0 means p2 is winning, output == 0 means tie
-    {
-	return p2.cardinality() - p1.cardinality();
     }
     
     public boolean isFull()

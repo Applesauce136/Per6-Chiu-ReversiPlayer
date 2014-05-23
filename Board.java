@@ -33,104 +33,92 @@ public class Board
     public Board()
     {
 	this(8);
-	p1.flipAt(3, 4);
-	p1.flipAt(4, 3);
-	p2.flipAt(3, 3);
-	p2.flipAt(4, 4);
+	set(3, 4, -1);
+	set(4, 3, -1);
+	set(3, 3, 1);
+	set(4, 4, 1);
 	//These flips initiate a standard Reversi game.
 	//p1 gets the top-right corner of the 2x2 box.
+    }
+
+    private Board(BitBoard p1, BitBoard p2)
+    {
+	rows = p1.getRows();
+	cols = p1.getCols();
+	this.p1 = p1;
+	this.p2 = p2;
     }
 
     //================================================================
     
     //MAIN STUFF
     //----------------------------------------------------------------
-
+    
     //CHECK
     //--------------------------------
-    
-    private boolean check(int player, int row, int col)
+
+    public boolean check(int player, int row, int col)
+    //Player = the player that is making this move.
     {
-	switch (player)
-	    {
-	    case 1:  return check(p1, p2, row, col);
-	    case 2:  return check(p2, p1, row, col);
-	    default: return false;
-	    }
-    }
-    
-    private boolean check(BitBoard act, BitBoard pas, int row, int col)
-    {
+	if (inBounds(row, col) &&
+	    get(row, col) == 0)
+	    return false;
+
 	for (int drow = -1; drow <= 1; drow++)
-	    {
-		for (int dcol = -1; dcol <= 1; dcol++)
+	    {for (int dcol = -1; dcol <= 1; dcol++)
 		    {if (drow == 0 && dcol == 0) continue;
-			if (check(act, pas, row + drow, col + dcol, drow, dcol))
-			    {
-				return true;
-			    }
+			if (!checkDir(player, row + drow, col + dcol, drow, dcol))
+			    return false;
 		    }
 	    }
-	return false;
+	return true;
     }
-    
-    private boolean check(BitBoard act, BitBoard pas, int row, int col, int drow, int dcol)
+
+    private boolean checkDir(int player, int row, int col, int drow, int dcol)
     {
-	boolean flipped = false;
-	while ( inBounds(row, col) &&
-		pas.getAt(row, col))
+	while (inBounds(row, col) &&
+	       get(row, col) == -1 * player) //Or, the tile we're on is the other player's.
 	    {
-		flipped = true;
 		row += drow;
 		col += dcol;
 	    }
-
-	return ( inBounds(row, col) &&
-		 act.getAt(row, col) &&
-		 flipped);
+	return (inBounds(row, col) &&
+		get(row, col) == player);
     }
-    
+
     //================================
-    
+
     //PLAY
     //--------------------------------
-    
-    private void play(int player, int row, int col)
+
+    public void play(int player, int row, int col)
     {
-	switch (player)
-	    {
-	    case 1:  play(p1, p2, row, col); break;
-	    case 2:  play(p2, p1, row, col); break;
-	    default: return;
-	    }
-    }
-    
-    private void play(BitBoard act, BitBoard pas, int row, int col)
-    {
+	if (inBounds(row, col) &&
+	    get(row, col) == 0)
+	    return;
+
 	for (int drow = -1; drow <= 1; drow++)
-	    {
-		for (int dcol = -1; dcol <= 1; dcol++)
+	    {for (int dcol = -1; dcol <= 1; dcol++)
 		    {if (drow == 0 && dcol == 0) continue;
-			if (check(act, pas, row + drow, col + dcol, drow, dcol))
-			    play(act, pas, row + drow, col + dcol, drow, dcol);
+			playDir(player, row, col, drow, dcol);
 		    }
 	    }
-	act.flipAt(row, col);
+	set(row, col, player);
     }
-    
-    private void play(BitBoard act, BitBoard pas, int row, int col, int drow, int dcol)
+
+    private void playDir(int player, int row, int col, int drow, int dcol)
     {
-	while ( inBounds(row, col) &&
-		pas.getAt(row, col))
+	while (inBounds(row, col) &&
+	       get(row, col) == -1 * player) //Or, the tile we're on is the other player's.
 	    {
-		flip(row, col);
+		set(row, col, player);
 		row += drow;
 		col += dcol;
 	    }
     }
-    
+
     //================================
-    
+
     //================================================================
     
     //UTILITY FUNCTIONS
@@ -138,28 +126,32 @@ public class Board
     
     public int getRows() { return rows; }
     public int getCols() { return cols; }
-    
-    public BitBoard clone()
+
+    public void set(int row, int col, int value)
     {
-	return (BitBoard)this.clone();
+	p1.setAt(row, col, value == -1);
+	p2.setAt(row, col, value == 1);
     }
 
-    private boolean empty(int row, int col)
+    public int get(int row, int col)
     {
-	return !( p1.getAt(row, col) || 
-		  p2.getAt(row, col) );
-    }
-    
-    private void flip(int row, int col)
-    {
-	p1.flipAt(row, col);
-	p2.flipAt(row, col);
-    }
+	if (p1.getAt(row, col))
+	    return -1;
+	else if (p2.getAt(row, col))
+	    return 1;
+	else
+	    return 0;
+    } 
     
     private boolean inBounds(int row, int col)
     {
 	return (0 <= row && row < getRows() &&
 		0 <= col && col < getCols());
+    }
+
+    public Board clone()
+    {
+	return new Board(p1.clone(), p2.clone());
     }
 
     //================================================================
