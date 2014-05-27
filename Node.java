@@ -5,9 +5,13 @@ public class Node
     //The thing that this class actually wraps around.
     private Board board;
 
-    private int	
-	player;
+    private int 
+    //The player who is about to move.
+	player,
+    //The score of the board.
+	score;
 
+    //All the possible board states after this one.
     private Node[] children;
     
     //The previous move.
@@ -15,40 +19,25 @@ public class Node
     
     //SCORING
     //----------------------------------------------------------------
-
-    public int score()
-    {
-	return score;
-    }
-    
-    public boolean isFull()
-    {
-	BitBoard union = (BitBoard)p1.clone();
-	union.or(p2);
-	return union.cardinality() == union.size();
-    }
+    /*
+      Some notes on scores:
+      -The magnitude of a score denotes the degree of advantage conferred;
+      -The direction (+/-) denotes the player who has the advantage.
+      -Negative denotes player 1, positive denotes player 2.
+     */
     
     //================================================================
 
     //PLAYER INFO
-    //--------------------------------
-    
-    public int getPlayer()
-    {
-	return player;
-    }
-    
-    public static int otherPlayer(int player)
-    {
-	return 3 - player;
-    }
-    
-    public static int playerSign(int player)
-    //p1's sign is -, p2's sign is +
-    {
-	return 2 * player - 3;
-    }
-    //================================
+    //----------------------------------------------------------------
+    /*
+      -Within the code, a negative number broadly signifies player 1,
+      -while a positive number broadly signifies player 2.
+      -When magnitude is not a concern,
+      -Use a magnitude of 1.
+     */
+
+    //================================================================
 
     public void initValids()
     {
@@ -70,11 +59,6 @@ public class Node
 	    {
 		valids[index] = raw[index];
 	    }
-    }
-    
-    public Move getLast()
-    {
-	return last;
     }
 
 }

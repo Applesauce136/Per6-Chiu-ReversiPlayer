@@ -1,6 +1,7 @@
 // -*-Java-*-
 
-import java.util.Arrays;
+import java.util.*;
+import java.io.*;
 
 public class Board
 {
@@ -60,28 +61,40 @@ public class Board
     public boolean check(int player, int row, int col)
     //Player = the player that is making this move.
     {
+	//System.out.println("CALLED check"); //DEBUG
+	//System.out.println("    inBounds(row, col): " + inBounds(row, col)); //DEBUG
+	//System.out.println("    get(row, col) == 0: " + (get(row, col) == 0)); //DEBUG
 	if (inBounds(row, col) &&
 	    get(row, col) == 0)
-	    return false;
-
-	for (int drow = -1; drow <= 1; drow++)
-	    {for (int dcol = -1; dcol <= 1; dcol++)
-		    {if (drow == 0 && dcol == 0) continue;
-			if (!checkDir(player, row + drow, col + dcol, drow, dcol))
-			    return false;
+	    {
+		//System.out.println("    ENTERING LOOP OF check"); //DEBUG
+		for (int drow = -1; drow <= 1; drow++)
+		    {for (int dcol = -1; dcol <= 1; dcol++)
+			    {if (drow == 0 && dcol == 0) continue;
+				if (checkDir(player, row + drow, col + dcol, drow, dcol))
+				    {
+					//System.out.printf("    TERMINATED ON (%d, %d)\n", drow, dcol); //DEBUG
+					return true;
+				    }
+			    }
 		    }
 	    }
-	return true;
+	//System.out.println("RETURNING FALSE"); //DEBUG
+	return false;
     }
 
     private boolean checkDir(int player, int row, int col, int drow, int dcol)
     {
+	//System.out.printf("        CHECKING (%d, %d) FROM (%d, %d)\n", drow, dcol, row, col); //DEBUG
 	while (inBounds(row, col) &&
 	       get(row, col) == -1 * player) //Or, the tile we're on is the other player's.
 	    {
+		//System.out.printf("            PASSED (%d, %d)\n", row, col); //DEBUG
 		row += drow;
 		col += dcol;
 	    }
+	//System.out.printf("        inBounds(row, col): %s%n", inBounds(row, col)); //DEBUG
+	//System.out.printf("        get(row, col) == player): %s%n", get(row, col) == player); //DEBUG
 	return (inBounds(row, col) &&
 		get(row, col) == player);
     }
@@ -93,24 +106,36 @@ public class Board
 
     public void play(int player, int row, int col)
     {
+	//System.out.print("CALLED PLAY\n"); //DEBUG
 	if (inBounds(row, col) &&
 	    get(row, col) == 0)
-	    return;
-
-	for (int drow = -1; drow <= 1; drow++)
-	    {for (int dcol = -1; dcol <= 1; dcol++)
-		    {if (drow == 0 && dcol == 0) continue;
-			playDir(player, row, col, drow, dcol);
+	    {
+		//System.out.println("    ENTERING LOOP OF play"); //DEBUG
+		for (int drow = -1; drow <= 1; drow++)
+		    {for (int dcol = -1; dcol <= 1; dcol++)
+			    {if (drow == 0 && dcol == 0) continue;
+				if (checkDir(player, row + drow, col + dcol, drow, dcol))
+				    playDir(player, row + drow, col + dcol, drow, dcol);
+			    }
 		    }
+		set(row, col, player);
 	    }
-	set(row, col, player);
     }
 
     private void playDir(int player, int row, int col, int drow, int dcol)
     {
+	//System.out.printf("        PLAYING IN (%d, %d) FROM (%d, %d)%n", drow, dcol, row, col); //DEBUG
+	//System.out.printf(                                                //DEBUG
+	//                  "        inBounds(row, col):            %s%n" + //DEBUG
+	//                  "        get(row, col) == -1 * player): %s%n",  //DEBUG
+	//                  inBounds(row, col),                             //DEBUG
+	//                  get(row, col) == (-1 * player));                //DEBUG
+
+
 	while (inBounds(row, col) &&
 	       get(row, col) == -1 * player) //Or, the tile we're on is the other player's.
 	    {
+		//System.out.printf("            FLIPPING (%d, %d)%n", row, col); //DEBUG
 		set(row, col, player);
 		row += drow;
 		col += dcol;
@@ -181,6 +206,59 @@ public class Board
 		output += '\n'; //newline between rows
 	    }
 	return output;
+    }
+
+    //================================================================
+
+    //BASIC TESTER THING
+    //----------------------------------------------------------------
+
+    public static void main(String[] args)
+    {
+	
+	Board game = new Board();
+
+	for (int player = -1; true; )
+	    {
+		System.out.println(game);
+		int[] coords = Driver_Board.getCoords(Driver_Board.getInput( player == -1 ? 'X' : 'O'));
+		if (Driver_Board.play(game, player, coords[0], coords[1]))
+		    player *= -1;
+	    }
+
+    }
+
+    private static class Driver_Board
+    {
+	private static boolean play(Board game, int player, int row, int col)
+	{
+	    if (game.check(player, row, col))
+		{
+		    game.play(player, row, col);
+		    return true;
+		}
+	    return false;
+	}
+
+	private static int[] getCoords(String input)
+	{
+	    Scanner s = new Scanner(input);
+	    return new int[] {s.nextInt(), s.nextInt()}; 
+	}
+
+	private static String getInput(char prompt)
+	{
+	    System.out.print(prompt + ": > ");
+	    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+	    try
+		{
+		    return in.readLine();
+		}
+	    catch (IOException e)
+		{
+		    return "";
+		}
+	}
     }
 
     //================================================================

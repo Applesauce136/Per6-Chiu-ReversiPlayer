@@ -14,7 +14,6 @@ public class Driver_Othello
 			 "To select a square, enter its coordinates." + "\n" +
 			 "Input the number on the left first, then the number on top." + "\n" +
 			 "The character by the prompt represents whose turn it is." + "\n" +
-			 "You can change the characters used by typing either WBmode or XOmode." + "\n" +
 			 "The game will automatically end when the board is full," + "\n" +
 			 "and you can also resign by typing 'resign'." + "\n" +
 			 
