@@ -14,9 +14,40 @@ public class Node
     //All the possible board states after this one.
     private Node[] children;
     
-    //The previous move.
-    private Move last;
-    
+    //CONSTRUCTOR
+    //----------------------------------------------------------------
+
+    public Node(Board board, int player)
+    {
+	this.board = board;
+	this.player = player;
+    }
+
+    public void calcValids()
+    {
+	Node[] raw = new Node[board.getRows() * board.getCols()];
+	int size = 0;
+	for (int row = 0; row < board.getRows(); row++)
+	    {for (int col = 0; col < board.getCols(); col++)
+		    {
+			if (board.check(player, row, col))
+			    {
+				Board newboard = board.clone();
+				newboard.play(player, row, col);
+				raw[size++] = new Node(newboard, -1 * player);
+			    }
+		    }
+	    }
+
+	children = new Node[size];
+	while (--size >= 0)
+	    {
+		children[size] = raw[size];
+	    }
+    }
+
+    //================================================================
+
     //SCORING
     //----------------------------------------------------------------
     /*
@@ -38,27 +69,5 @@ public class Node
      */
 
     //================================================================
-
-    public void initValids()
-    {
-	Board[] raw = new Board[getRows() * getCols()];
-	int index = 0;
-	for (int row = 0; row < getRows(); row++)
-	    {
-		for (int col = 0; col < getCols(); col++)
-		    {
-			if (check(row, col))
-			    {
-				raw[index++] = new Board(this, new Move(row, col));
-			    }
-		    }
-	    }
-	
-	valids = new Board[index--];
-	for (; index >= 0; index--)
-	    {
-		valids[index] = raw[index];
-	    }
-    }
 
 }
