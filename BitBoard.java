@@ -1,8 +1,4 @@
 // -*-Java-*-
-/**
-   Two-dimensional array version of BitSet.
-   Adds two-dimensional array functionality.
- */
 
 import java.util.BitSet;
 
@@ -64,13 +60,26 @@ public class BitBoard extends BitSet
 		throw new IndexOutOfBoundsException();
 	    }
     }
-    //for the record, I know for a FACT that Lisp macros would make this so much nicer
 
     public void setAt(int row, int col)
     {
 	setAt(row, col, true);
     }
 
+    public void flipAt(int row, int col)
+    {
+	if ( inBounds(row, col) )
+	    {
+		flip( lineify(row, col));
+		//lineify converts a coordinate pair into an index (see below)
+	    }
+	else
+	    {
+		throw new IndexOutOfBoundsException();
+	    }
+    }
+
+    //for the record, I know for a fact that Lisp macros would make this so much nicer   
     //================================================================
 
     //HELPER FUNCTIONS
@@ -96,7 +105,40 @@ public class BitBoard extends BitSet
 
     //================================================================
 
+    //PRESETS
+    //----------------------------------------------------------------
 
+    public static void main(String[] args)
+    {
+	System.out.println(corners());
+	System.out.println(edges());
+    }
+
+    public static BitBoard corners()
+    {
+	BitBoard output = new BitBoard();
+	output.setAt(0, 0);
+	output.setAt(output.getRows() - 1, 0);
+	output.setAt(0, output.getRows() - 1);
+	output.setAt(output.getRows() - 1, output.getRows() - 1);
+	return output;
+    }
+
+    public static BitBoard edges()
+    {
+	BitBoard output = new BitBoard();
+	for (int count = 0; count < output.getRows(); count++)
+	    {
+		output.setAt(0, count);
+		output.setAt(count, 0);
+
+		output.setAt(output.getRows() - 1, count);
+		output.setAt(count, output.getRows() - 1);
+	    }
+	return output;
+    }
+
+    //================================================================
 
     public String toString()
     {

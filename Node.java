@@ -23,7 +23,12 @@ public class Node
 	this.player = player;
     }
 
-    public void calcValids()
+    public Node()
+    {
+	this(new Board(), -1);
+    }
+
+    public void init()
     {
 	Node[] raw = new Node[board.getRows() * board.getCols()];
 	int size = 0;
@@ -48,6 +53,32 @@ public class Node
 
     //================================================================
 
+    //----------------------------------------------------------------
+
+    public boolean initialized()
+    {
+	return children == null;
+    }
+    
+    public int size()
+    {
+	return children.length;
+    }
+
+    public Node getChild(int index)
+    {
+	try
+	    {
+		return children[index];
+	    }
+	catch (NullPointerException e)
+	    {
+		throw new IllegalStateException("Children not initialized");
+	    }
+    }
+
+    //================================================================
+
     //SCORING
     //----------------------------------------------------------------
     /*
@@ -56,7 +87,48 @@ public class Node
       -The direction (+/-) denotes the player who has the advantage.
       -Negative denotes player 1, positive denotes player 2.
      */
-    
+
+    private static int 
+	CORNER_MODIFIER = 10,
+	EDGE_MODIFIER = 5;
+
+    public int score()
+    {
+	int score = 0;
+	score += countTiles();
+	score += count(BitBoard.corners());
+	score += count(BitBoard.edges());
+	return score;
+    }
+
+    public int countTiles()
+    {
+	return board.p2().cardinality() - board.p1().cardinality();
+    }
+
+    public int count(BitBoard other)
+    {
+	BitBoard 
+	    p1 = board.p1(),
+	    p2 = board.p2();
+	p1.or(other);
+	p2.or(other);
+	return p2.cardinality() - p1.cardinality();
+    }
+
+    public int branchScore()
+    {
+	int score = score();
+	if (initialized())
+	    {
+		for (int index = 0; index < size(); index++)
+		    {
+			score += getChild(index).branchScore();
+		    }
+	    }
+	return score;
+    }
+
     //================================================================
 
     //PLAYER INFO

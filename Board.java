@@ -152,6 +152,9 @@ public class Board
     public int getRows() { return rows; }
     public int getCols() { return cols; }
 
+    public BitBoard p1() { return p1.clone(); }
+    public BitBoard p2() { return p2.clone(); }
+
     public void set(int row, int col, int value)
     {
 	p1.setAt(row, col, value == -1);
@@ -176,7 +179,7 @@ public class Board
 
     public Board clone()
     {
-	return new Board(p1.clone(), p2.clone());
+	return new Board(p1(), p2());
     }
 
     //================================================================
