@@ -60,7 +60,7 @@ public class Node
 
     public boolean initialized()
     {
-	return children == null;
+	return children != null;
     }
     
     public int size()
@@ -161,6 +161,19 @@ public class Node
       -Use a magnitude of 1.
      */
 
+    public int getPlayer()
+    {
+	return player;
+    }
+
     //================================================================
+
+    public String toString()
+    {
+	String output = String.format("Last move: %s%n" + 
+				      board.toString(),
+				      last);
+	return output;
+    }
 
 }

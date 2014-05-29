@@ -1,23 +1,29 @@
+import java.util.*;
+import java.io.*;
+
 public class Driver
 {
 
-    private static boolean play(Board game, int player, int row, int col)
+    public static void main(String[] args)
     {
-	if (game.check(player, row, col))
+	while (true)
 	    {
-		game.play(player, row, col);
-		return true;
+		System.out.println(game);
+		String input = getInput(game.currPlayer() == -1 ? "X" : "O");
+		Move coords = getCoords(input);
+		game.play(coords);
 	    }
-	return false;
     }
 
-    private static int[] getCoords(String input)
+    private static Tree game = new Tree(0);
+
+    private static Move getCoords(String input)
     {
 	Scanner s = new Scanner(input);
-	return new int[] {s.nextInt(), s.nextInt()}; 
+	return new Move( s.nextInt(), s.nextInt() ); 
     }
 
-    private static String getInput(char prompt)
+    private static String getInput(String prompt)
     {
 	System.out.print(prompt + ": > ");
 	BufferedReader in = new BufferedReader(new InputStreamReader(System.in));

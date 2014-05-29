@@ -2,24 +2,26 @@ public class Tree
 {
 
     private Node root;
+    private int ai;
 
-    public Tree()
+    public Tree(int ai)
     {
 	root = new Node();
+	this.ai = (int)Math.signum(ai);
     }
 
     public boolean play(Move move)
     {
+	buildLevel();
 	Node next = root.play(move);
-	if (next != null)
-	    {
-		root = next;
-		return true;
-	    }
-	else
-	    {
-		return false;
-	    }
+	boolean output = next != null;
+	if (output) root = next;
+	return output;
+    }
+
+    public int currPlayer()
+    {
+	return root.getPlayer();
     }
 
     public void buildLevel()
@@ -27,7 +29,7 @@ public class Tree
 	buildLevel(root);
     }
 
-    public void buildLevel(Node curr)
+    private void buildLevel(Node curr)
     {
 	if (!curr.initialized())
 	    {
@@ -40,6 +42,11 @@ public class Tree
 			buildLevel(curr.getChild(index));
 		    }
 	    }
+    }
+
+    public String toString()
+    {
+	return root.toString();
     }
 
 }
