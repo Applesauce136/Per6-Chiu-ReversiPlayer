@@ -7,9 +7,10 @@ public class Node
 
     private int 
     //The player who is about to move.
-	player,
-    //The score of the board.
-	score;
+	player;
+
+    //The last move that was played; or, the move that generated the current board.
+    private Move last;
 
     //All the possible board states after this one.
     private Node[] children;
@@ -17,15 +18,16 @@ public class Node
     //CONSTRUCTOR
     //----------------------------------------------------------------
 
-    public Node(Board board, int player)
+    public Node(Board board, int player, Move last)
     {
 	this.board = board;
 	this.player = player;
+	this.last = last;
     }
 
     public Node()
     {
-	this(new Board(), -1);
+	this(new Board(), -1, null);
     }
 
     public void init()
@@ -39,7 +41,7 @@ public class Node
 			    {
 				Board newboard = board.clone();
 				newboard.play(player, row, col);
-				raw[size++] = new Node(newboard, -1 * player);
+				raw[size++] = new Node(newboard, -1 * player, new Move(row, col));
 			    }
 		    }
 	    }
@@ -53,6 +55,7 @@ public class Node
 
     //================================================================
 
+    //MAIN
     //----------------------------------------------------------------
 
     public boolean initialized()
@@ -75,6 +78,24 @@ public class Node
 	    {
 		throw new IllegalStateException("Children not initialized");
 	    }
+    }
+
+    public Node play(Move move)
+    {
+	for (int index = 0; index < size(); index++)
+	    {
+		Node curr = getChild(index);
+		if (curr.getLast().equals(move))
+		    {
+			return curr;
+		    }
+	    }
+	return null;
+    }
+
+    public Move getLast()
+    {
+	return last;
     }
 
     //================================================================

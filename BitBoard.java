@@ -47,6 +47,7 @@ public class BitBoard extends BitSet
 		throw new IndexOutOfBoundsException();
 	    }
     }
+    public boolean getAt(Move move) {return getAt(move.row(), move.col());}
 
     public void setAt(int row, int col, boolean value)
     {
@@ -60,11 +61,10 @@ public class BitBoard extends BitSet
 		throw new IndexOutOfBoundsException();
 	    }
     }
+    public void setAt(int row, int col)         { setAt(row, col, true); }
+    public void setAt(Move move, boolean value) { setAt(move.row(), move.col(), value); }
+    public void setAt(Move move)                { setAt(move, true); }
 
-    public void setAt(int row, int col)
-    {
-	setAt(row, col, true);
-    }
 
     public void flipAt(int row, int col)
     {
@@ -78,6 +78,7 @@ public class BitBoard extends BitSet
 		throw new IndexOutOfBoundsException();
 	    }
     }
+    public void flipAt(Move move) { flipAt(move.row(), move.col()); }
 
     //for the record, I know for a fact that Lisp macros would make this so much nicer   
     //================================================================
