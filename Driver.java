@@ -6,11 +6,28 @@ public class Driver
 
     public static void main(String[] args)
     {
+	game = new Tree(0);
+	try
+	    {
+		game = new Tree(Integer.parseInt(args[0]));
+	    }
+	catch (IndexOutOfBoundsException e) {}
+	catch (NumberFormatException e) {}
+
 	while (true)
 	    {
 		System.out.println(game);
+		ThreadTree thing = new ThreadTree(game);
 		String input = getInput(game.currPlayer() == -1 ? "X" : "O");
 		Move coords = getCoords(input);
+		try
+		    {
+			thing.join(500);
+		    }
+		catch (InterruptedException e)
+		    {
+
+		    }
 		game.play(coords);
 		if (game.currPlayer() == game.AIPlayer())
 		    {
@@ -20,7 +37,7 @@ public class Driver
 	    }
     }
 
-    private static Tree game = new Tree(1);
+    private static Tree game;
 
     private static Move getCoords(String input)
     {

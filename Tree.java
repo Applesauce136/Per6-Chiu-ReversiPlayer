@@ -29,6 +29,11 @@ public class Tree
 	root = root.playBest();
     }
 
+    public void buildLevel()
+    {
+	root.buildLevel();
+    }
+
     public int currPlayer()
     {
 	return root.getPlayer();
