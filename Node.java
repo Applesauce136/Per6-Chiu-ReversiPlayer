@@ -1,6 +1,8 @@
 // -*-Java-*-
 
-public class Node
+import java.util.*;
+
+public class Node implements Comparable<Node>
 {
     //The thing that this class actually wraps around.
     private Board board;
@@ -13,7 +15,7 @@ public class Node
     private Move last;
 
     //All the possible board states after this one.
-    private Node[] children;
+    private PriorityQueue<Node> children;
     
     //CONSTRUCTOR
     //----------------------------------------------------------------
@@ -32,8 +34,7 @@ public class Node
 
     public void init()
     {
-	Node[] raw = new Node[board.getRows() * board.getCols()];
-	int size = 0;
+	children = new PriorityQueue<Node>();
 	for (int row = 0; row < board.getRows(); row++)
 	    {for (int col = 0; col < board.getCols(); col++)
 		    {
@@ -41,15 +42,9 @@ public class Node
 			    {
 				Board newboard = board.clone();
 				newboard.play(player, row, col);
-				raw[size++] = new Node(newboard, -1 * player, new Move(row, col));
+				children.add(new Node(newboard, -1 * player, new Move(row, col)));
 			    }
 		    }
-	    }
-
-	children = new Node[size];
-	while (--size >= 0)
-	    {
-		children[size] = raw[size];
 	    }
     }
 
@@ -65,37 +60,44 @@ public class Node
     
     public int size()
     {
-	return children.length;
-    }
-
-    public Node getChild(int index)
-    {
-	try
-	    {
-		return children[index];
-	    }
-	catch (NullPointerException e)
-	    {
-		throw new IllegalStateException("Children not initialized");
-	    }
+	return children.size();
     }
 
     public Node play(Move move)
     {
-	for (int index = 0; index < size(); index++)
+	for (Node child : children)
 	    {
-		Node curr = getChild(index);
-		if (curr.getLast().equals(move))
+		if (child.getLast().equals(move))
 		    {
-			return curr;
+			return child;
 		    }
 	    }
 	return null;
     }
 
+    public Node playBest()
+    {
+	return children.poll();
+    }
+
     public Move getLast()
     {
 	return last;
+    }
+
+    public void buildLevel()
+    {
+	if (!initialized())
+	    {
+		init();
+	    }
+	else
+	    {
+		for (Node child : children)
+		    {
+			child.buildLevel();
+		    }
+	    }
     }
 
     //================================================================
@@ -132,8 +134,8 @@ public class Node
 	BitBoard 
 	    p1 = board.p1(),
 	    p2 = board.p2();
-	p1.or(other);
-	p2.or(other);
+	p1.and(other);
+	p2.and(other);
 	return p2.cardinality() - p1.cardinality();
     }
 
@@ -142,9 +144,9 @@ public class Node
 	int score = score();
 	if (initialized())
 	    {
-		for (int index = 0; index < size(); index++)
+		for (Node child : children)
 		    {
-			score += getChild(index).branchScore();
+			score += child.branchScore();
 		    }
 	    }
 	return score;
@@ -171,9 +173,17 @@ public class Node
     public String toString()
     {
 	String output = String.format("Last move: %s%n" + 
-				      board.toString(),
-				      last);
+				      "Score: %d%n" +
+				      "%s",
+				      last,
+				      branchScore(),
+				      board.toString());
 	return output;
+    }
+
+    public int compareTo(Node that)
+    {
+	return player * (this.branchScore() - that.branchScore());
     }
 
 }

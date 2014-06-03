@@ -86,16 +86,19 @@ public class Board
     private boolean checkDir(int player, int row, int col, int drow, int dcol)
     {
 	//System.out.printf("        CHECKING (%d, %d) FROM (%d, %d)\n", drow, dcol, row, col); //DEBUG
+	boolean entered = false;
 	while (inBounds(row, col) &&
 	       get(row, col) == -1 * player) //Or, the tile we're on is the other player's.
 	    {
 		//System.out.printf("            PASSED (%d, %d)\n", row, col); //DEBUG
 		row += drow;
 		col += dcol;
+		entered = true;
 	    }
 	//System.out.printf("        inBounds(row, col): %s%n", inBounds(row, col)); //DEBUG
 	//System.out.printf("        get(row, col) == player): %s%n", get(row, col) == player); //DEBUG
 	return (inBounds(row, col) &&
+		entered &&
 		get(row, col) == player);
     }
 

@@ -2,6 +2,8 @@ public class Tree
 {
 
     private Node root;
+
+    //-1 if player 1 is the AI, 1 if player 2 is the AI, 0 if two-player game
     private int ai;
 
     public Tree(int ai)
@@ -12,11 +14,19 @@ public class Tree
 
     public boolean play(Move move)
     {
-	buildLevel();
+	//DELETE THIS WHEN THREADING WORKS
+	root.buildLevel();
+
 	Node next = root.play(move);
-	boolean output = next != null;
-	if (output) root = next;
-	return output;
+	boolean output = next != null; //valid move?
+	if (output) root = next; //play it
+	return output; //return if it worked or not
+    }
+
+    public void playBest()
+    {
+	root.buildLevel();
+	root = root.playBest();
     }
 
     public int currPlayer()
@@ -24,24 +34,9 @@ public class Tree
 	return root.getPlayer();
     }
 
-    public void buildLevel()
+    public int AIPlayer()
     {
-	buildLevel(root);
-    }
-
-    private void buildLevel(Node curr)
-    {
-	if (!curr.initialized())
-	    {
-		curr.init();
-	    }
-	else
-	    {
-		for (int index = 0; index < curr.size(); index++)
-		    {
-			buildLevel(curr.getChild(index));
-		    }
-	    }
+	return ai;
     }
 
     public String toString()

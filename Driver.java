@@ -12,10 +12,15 @@ public class Driver
 		String input = getInput(game.currPlayer() == -1 ? "X" : "O");
 		Move coords = getCoords(input);
 		game.play(coords);
+		if (game.currPlayer() == game.AIPlayer())
+		    {
+			System.out.println(game);
+			game.playBest();
+		    }
 	    }
     }
 
-    private static Tree game = new Tree(0);
+    private static Tree game = new Tree(1);
 
     private static Move getCoords(String input)
     {
