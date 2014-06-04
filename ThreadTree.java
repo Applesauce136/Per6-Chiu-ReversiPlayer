@@ -14,12 +14,14 @@ public class ThreadTree extends Thread
 	    {
 		while (true)
 		    {
+			if (this.isInterrupted() || Thread.interrupted())
+			    return;
 			game.buildLevel();
 		    }
 	    }
 	catch (StackOverflowError e)
 	    {
-		return;
+		//System.out.println("OOM");
 	    }
     }
 

@@ -173,17 +173,20 @@ public class Node implements Comparable<Node>
     public String toString()
     {
 	String output = String.format("Last move: %s%n" + 
-				      "Score: %d%n" +
+				      //"Score: %d%n" +
 				      "%s",
 				      last,
-				      branchScore(),
+				      //branchScore(),
 				      board.toString());
 	return output;
     }
 
     public int compareTo(Node that)
     {
-	return player * (this.branchScore() - that.branchScore());
+	if (this.getPlayer() == that.getPlayer())
+	    return player * (this.branchScore() - that.branchScore());
+	else
+	    throw new IllegalArgumentException("Player no. does not match");
     }
 
 }

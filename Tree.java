@@ -14,9 +14,6 @@ public class Tree
 
     public boolean play(Move move)
     {
-	//DELETE THIS WHEN THREADING WORKS
-	root.buildLevel();
-
 	Node next = root.play(move);
 	boolean output = next != null; //valid move?
 	if (output) root = next; //play it
@@ -25,12 +22,12 @@ public class Tree
 
     public void playBest()
     {
-	root.buildLevel();
 	root = root.playBest();
     }
 
     public void buildLevel()
     {
+	//System.out.println("LB");
 	root.buildLevel();
     }
 

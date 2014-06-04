@@ -18,15 +18,17 @@ public class Driver
 	    {
 		System.out.println(game);
 		ThreadTree thing = new ThreadTree(game);
+		thing.start();
 		String input = getInput(game.currPlayer() == -1 ? "X" : "O");
 		Move coords = getCoords(input);
 		try
 		    {
 			thing.join(500);
 		    }
-		catch (InterruptedException e)
+		catch (InterruptedException e) 
 		    {
-
+			System.out.println("Something went wrong, sorry!");
+			return;
 		    }
 		game.play(coords);
 		if (game.currPlayer() == game.AIPlayer())
