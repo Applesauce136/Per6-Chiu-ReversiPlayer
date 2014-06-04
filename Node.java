@@ -101,15 +101,13 @@ public class Node implements Comparable<Node>, Runnable
 		    {
 			if (Runtime.getRuntime().freeMemory() >= 1000000)
 			    return;
+
 			Thread curr;
 			try
 			    {
 				curr = new Thread(child, child.getLast().toString());
 			    }
-			catch (OutOfMemoryError e)
-			    {
-				return;
-			    }
+			catch (OutOfMemoryError e) {return;}
 
 			if (!Thread.interrupted())
 			    {
