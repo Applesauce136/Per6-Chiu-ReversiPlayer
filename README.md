@@ -12,3 +12,5 @@ Status:
 -AI is not
 
 -Board predetermines all possible moves rather than checking them as they're requested -- important step in AI development
+
+TO MR. K: When you see a hole in commits about the last week of May, that was the period in which I tried to get emacs' processing-mode to work with my machine.  I didn't.
