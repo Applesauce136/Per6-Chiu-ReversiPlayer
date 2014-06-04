@@ -2,7 +2,7 @@
 
 import java.util.*;
 
-public class Node implements Comparable<Node>
+public class Node implements Comparable<Node>, Runnable
 {
     //The thing that this class actually wraps around.
     private Board board;
@@ -60,10 +60,12 @@ public class Node implements Comparable<Node>
     
     public int size()
     {
+	if (!initialized())
+	    init();
 	return children.size();
     }
 
-    public Node play(Move move)
+    public Node find(Move move)
     {
 	for (Node child : children)
 	    {
@@ -75,8 +77,10 @@ public class Node implements Comparable<Node>
 	return null;
     }
 
-    public Node playBest()
+    public Node best()
     {
+	if (!initialized())
+	    init();
 	return children.poll();
     }
 
@@ -85,7 +89,7 @@ public class Node implements Comparable<Node>
 	return last;
     }
 
-    public void buildLevel()
+    public void run()
     {
 	if (!initialized())
 	    {
@@ -95,7 +99,26 @@ public class Node implements Comparable<Node>
 	    {
 		for (Node child : children)
 		    {
-			child.buildLevel();
+			if (Runtime.getRuntime().freeMemory() >= 1000000)
+			    return;
+			Thread curr;
+			try
+			    {
+				curr = new Thread(child, child.getLast().toString());
+			    }
+			catch (OutOfMemoryError e)
+			    {
+				return;
+			    }
+
+			if (!Thread.interrupted())
+			    {
+				curr.start();
+			    }
+			else
+			    {
+				curr.interrupt();
+			    }
 		    }
 	    }
     }
@@ -173,17 +196,20 @@ public class Node implements Comparable<Node>
     public String toString()
     {
 	String output = String.format("Last move: %s%n" + 
-				      "Score: %d%n" +
+				      //"Score: %d%n" +
 				      "%s",
 				      last,
-				      branchScore(),
+				      //branchScore(),
 				      board.toString());
 	return output;
     }
 
     public int compareTo(Node that)
     {
-	return player * (this.branchScore() - that.branchScore());
+	if (this.getPlayer() == that.getPlayer())
+	    return player * (this.branchScore() - that.branchScore());
+	else
+	    throw new IllegalArgumentException("Player no. does not match");
     }
 
 }

@@ -6,21 +6,41 @@ public class Driver
 
     public static void main(String[] args)
     {
+	game = new Tree(0);
+	try
+	    {
+		game = new Tree(Integer.parseInt(args[0]));
+	    }
+	catch (IndexOutOfBoundsException e) {}
+	catch (NumberFormatException e) {}
+
 	while (true)
 	    {
 		System.out.println(game);
+		Thread thing = new Thread(game);
+		thing.start();
 		String input = getInput(game.currPlayer() == -1 ? "X" : "O");
 		Move coords = getCoords(input);
+		try
+		    {
+			thing.join(500);
+		    }
+		catch (InterruptedException e) 
+		    {
+			System.out.println("Something went wrong, sorry!");
+			return;
+		    }
+		thing.interrupt();
 		game.play(coords);
 		if (game.currPlayer() == game.AIPlayer())
 		    {
 			System.out.println(game);
-			game.playBest();
+			game.play();
 		    }
 	    }
     }
 
-    private static Tree game = new Tree(1);
+    private static Tree game;
 
     private static Move getCoords(String input)
     {

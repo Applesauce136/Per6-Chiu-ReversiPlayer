@@ -1,4 +1,4 @@
-public class Tree
+public class Tree implements Runnable
 {
 
     private Node root;
@@ -14,19 +14,45 @@ public class Tree
 
     public boolean play(Move move)
     {
-	//DELETE THIS WHEN THREADING WORKS
-	root.buildLevel();
-
-	Node next = root.play(move);
+	Node next = root.find(move);
 	boolean output = next != null; //valid move?
-	if (output) root = next; //play it
+	if (output) play(next); //play it
 	return output; //return if it worked or not
     }
 
-    public void playBest()
+    public boolean play()
     {
-	root.buildLevel();
-	root = root.playBest();
+	play(root.best());
+	return true;
+    }
+
+    private void play(Node next)
+    {
+	root = next;
+	Runtime.getRuntime().gc();
+    }
+
+    public void run()
+    {
+	while (Runtime.getRuntime().freeMemory() >= 1000000)
+	    {
+		Thread curr;
+		try
+		    {
+			curr = new Thread(root, "root");
+		    }
+		catch (OutOfMemoryError e)
+		    {
+			return;
+		    }
+		if (!Thread.interrupted())
+		    curr.start();
+		else
+		    {
+			curr.interrupt();
+			return;
+		    }
+	    }
     }
 
     public int currPlayer()
