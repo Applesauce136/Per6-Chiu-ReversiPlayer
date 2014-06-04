@@ -14,9 +14,11 @@ public class ThreadTree extends Thread
 	    {
 		while (true)
 		    {
-			if (this.isInterrupted() || Thread.interrupted())
+			if (!Thread.interrupted())
+			    new Thread(game).start();
+			else
 			    return;
-			game.buildLevel();
+
 		    }
 	    }
 	catch (StackOverflowError e)

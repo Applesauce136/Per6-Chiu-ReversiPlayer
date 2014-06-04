@@ -17,7 +17,7 @@ public class Driver
 	while (true)
 	    {
 		System.out.println(game);
-		ThreadTree thing = new ThreadTree(game);
+		Thread thing = new Thread(game);
 		thing.start();
 		String input = getInput(game.currPlayer() == -1 ? "X" : "O");
 		Move coords = getCoords(input);
@@ -34,7 +34,7 @@ public class Driver
 		if (game.currPlayer() == game.AIPlayer())
 		    {
 			System.out.println(game);
-			game.playBest();
+			game.play();
 		    }
 	    }
     }

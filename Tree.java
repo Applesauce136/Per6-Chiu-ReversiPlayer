@@ -1,4 +1,4 @@
-public class Tree
+public class Tree implements Runnable
 {
 
     private Node root;
@@ -14,21 +14,29 @@ public class Tree
 
     public boolean play(Move move)
     {
-	Node next = root.play(move);
+	Node next = root.find(move);
 	boolean output = next != null; //valid move?
-	if (output) root = next; //play it
+	if (output) play(next); //play it
 	return output; //return if it worked or not
     }
 
-    public void playBest()
+    public boolean play()
     {
-	root = root.playBest();
+	play(root.best());
+	return true;
     }
 
-    public void buildLevel()
+    private void play(Node next)
     {
-	//System.out.println("LB");
-	root.buildLevel();
+	root = next;
+    }
+
+    public void run()
+    {
+	if (!Thread.interrupted())
+	    new Thread(root).start();
+	else
+	    return;
     }
 
     public int currPlayer()

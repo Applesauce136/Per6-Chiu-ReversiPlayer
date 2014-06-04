@@ -2,7 +2,7 @@
 
 import java.util.*;
 
-public class Node implements Comparable<Node>
+public class Node implements Comparable<Node>, Runnable
 {
     //The thing that this class actually wraps around.
     private Board board;
@@ -60,10 +60,12 @@ public class Node implements Comparable<Node>
     
     public int size()
     {
+	if (!initialized())
+	    init();
 	return children.size();
     }
 
-    public Node play(Move move)
+    public Node find(Move move)
     {
 	for (Node child : children)
 	    {
@@ -75,8 +77,10 @@ public class Node implements Comparable<Node>
 	return null;
     }
 
-    public Node playBest()
+    public Node best()
     {
+	if (!initialized())
+	    init();
 	return children.poll();
     }
 
@@ -85,8 +89,9 @@ public class Node implements Comparable<Node>
 	return last;
     }
 
-    public void buildLevel()
+    public void run()
     {
+	System.out.println("running");
 	if (!initialized())
 	    {
 		init();
@@ -95,7 +100,10 @@ public class Node implements Comparable<Node>
 	    {
 		for (Node child : children)
 		    {
-			child.buildLevel();
+			if (!Thread.interrupted())
+			    new Thread(child).start();
+			else
+			    return;
 		    }
 	    }
     }
