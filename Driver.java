@@ -30,6 +30,7 @@ public class Driver
 			System.out.println("Something went wrong, sorry!");
 			return;
 		    }
+		thing.interrupt();
 		game.play(coords);
 		if (game.currPlayer() == game.AIPlayer())
 		    {

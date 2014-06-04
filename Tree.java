@@ -29,14 +29,30 @@ public class Tree implements Runnable
     private void play(Node next)
     {
 	root = next;
+	Runtime.getRuntime().gc();
     }
 
     public void run()
     {
-	if (!Thread.interrupted())
-	    new Thread(root).start();
-	else
-	    return;
+	while (Runtime.getRuntime().freeMemory() >= 1000000)
+	    {
+		Thread curr;
+		try
+		    {
+			curr = new Thread(root, "root");
+		    }
+		catch (OutOfMemoryError e)
+		    {
+			return;
+		    }
+		if (!Thread.interrupted())
+		    curr.start();
+		else
+		    {
+			curr.interrupt();
+			return;
+		    }
+	    }
     }
 
     public int currPlayer()
