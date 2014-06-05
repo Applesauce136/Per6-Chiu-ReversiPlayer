@@ -65,13 +65,13 @@ public class Node implements Comparable<Node>, Runnable
     
     public int size()
     {
-	if (!initialized()) init();
+	if (!initialized())
+	    init();
 	return children.size();
     }
 
     public Node find(Move move)
     {
-	if (!initialized()) init();
 	for (Node child : children)
 	    {
 		if (child.getLast().equals(move))
@@ -84,7 +84,8 @@ public class Node implements Comparable<Node>, Runnable
 
     public Node best()
     {
-	if (!initialized()) init();
+	if (!initialized())
+	    init();
 	return children.poll();
     }
 
