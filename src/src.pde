@@ -7,16 +7,22 @@ private Thread build;
 
 void setup()
 {
-    size(squareSize * 8, squareSize * 8);
+    System.out.printf("setup...%n");
+    size(squareSize * rows, squareSize * cols);
     game = new Tree(1);
     noLoop();
+    System.out.printf("setup complete%n");
     redraw();
 }
 
 void draw()
 {
+    System.out.printf("redrawing...%n");
+    build = new Thread(game);
+    build.start();
+
     background(0, 150, 0);
-    int parts = 8;
+    int parts = rows;
     for (int count = 1; count <= parts - 1; count++)
 	{
 	    line(count * width / parts, height, count * width / parts, 0);
@@ -35,9 +41,7 @@ void draw()
 		    ellipse(squareSize * row + squareSize / 2, squareSize * col + squareSize / 2, squareSize - 10, squareSize - 10);
 		}
 	}
-
-    build = new Thread(game);
-    build.start();
+    System.out.printf("done redrawing%n");
 }
 
 void mouseClicked()
@@ -45,14 +49,18 @@ void mouseClicked()
     int row = mouseX / squareSize;
     int col = mouseY / squareSize;
     round(new Move(row, col));
+    redraw();
     if (game.AIPlayer() == game.currPlayer())
 	{
+	    System.out.printf("AI:%n");
 	    round(null);
+	    redraw();
 	}
 }
 
 void round(Move move)
 {
+    System.out.printf("playing...%n", move);
     try 
 	{
 	    build.join(500);
@@ -63,5 +71,5 @@ void round(Move move)
 	}
     build.interrupt();
     game.play(move);
-    redraw();
+    System.out.printf("done playing%n");
 }
