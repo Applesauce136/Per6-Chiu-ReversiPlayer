@@ -83,7 +83,7 @@ void round(Move move)
 	    if (newroot != null)
 		{
 		    root = newroot;
-		    Runtime.getRuntime().gc();
+		    System.gc();
 		}
 	}
 }
