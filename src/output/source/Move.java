@@ -16,10 +16,10 @@ public class Move
     public int row() { return row; }
     public int col() { return col; }
     
-    public boolean equals(Move other)
+    public boolean equals(Move that)
     {
-	return (this.row() == other.row() &&
-		this.col() == other.col() );
+	return (this.row() == that.row() &&
+		this.col() == that.col() );
     }
 
     public String toString()

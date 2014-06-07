@@ -18,20 +18,20 @@ private int
     squareSize = 80,
     rows = 8,
     cols = 8;
-private Tree game;
+private Node root;
 private Thread build;
 
 public void setup()
 {
     size(squareSize * rows, squareSize * cols);
-    game = new Tree(1);
+    root = new Node();
     frameRate(60);
     noLoop();
 }
 
 public void draw()
 {
-    build = new Thread(game);
+    build = new Thread(root);
     build.start();
 
     drawBG();
@@ -54,9 +54,9 @@ public void drawPieces()
    for (int row = 0; row < rows; row++)
 	{for (int col = 0; col < cols; col++)
 		{
-		    if (game.check(row, col) == -1)
+		    if (root.check(row, col) == -1)
 			fill(255);
-		    else if (game.check(row, col) == 1)
+		    else if (root.check(row, col) == 1)
 			fill(0);
 		    else
 			continue;
@@ -67,27 +67,38 @@ public void drawPieces()
 
 public void mouseClicked()
 {
+    loop();
     int row = mouseX / squareSize;
     int col = mouseY / squareSize;
     round(new Move(row, col));
-    if (game.AIPlayer() == game.currPlayer())
+    if (root.getPlayer() == 1)
 	{
-	    System.out.printf("AI:%n");
 	    round(null);
 	}
+    noLoop();
 }
 
 public void round(Move move)
 {
-    loop();
     try 
 	{
 	    build.join(500);
 	} 
     catch (InterruptedException e) {}
     build.interrupt();
-    game.play(move);
-    noLoop();
+    if (move == null)
+	{
+	    root = root.best();
+	}
+    else
+	{
+	    Node newroot = root.find(move);
+	    if (newroot != null)
+		{
+		    root = newroot;
+		    Runtime.getRuntime().gc();
+		}
+	}
 }
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "src" };

@@ -37,16 +37,16 @@ public class Tree implements Runnable
 		try
 		    {
 			curr = new Thread(root, "root");
+			if (!Thread.interrupted())
+			    curr.start();
+			else
+			    {
+				curr.interrupt();
+				return;
+			    }
 		    }
 		catch (OutOfMemoryError e)
 		    {
-			return;
-		    }
-		if (!Thread.interrupted())
-		    curr.start();
-		else
-		    {
-			curr.interrupt();
 			return;
 		    }
 	    }
