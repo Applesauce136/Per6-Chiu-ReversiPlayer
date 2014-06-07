@@ -44,7 +44,10 @@ void drawPieces()
 			fill(0);
 		    else
 			continue;
-		    ellipse(squareSize * row + squareSize / 2, squareSize * col + squareSize / 2, squareSize - 10, squareSize - 10);
+		    ellipse(squareSize * row + squareSize / 2, 
+			    squareSize * col + squareSize / 2, 
+			    squareSize - 10, 
+			    squareSize - 10);
 		}
 	}
 }
