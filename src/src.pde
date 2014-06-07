@@ -7,29 +7,35 @@ private Thread build;
 
 void setup()
 {
-    System.out.printf("setup...%n");
     size(squareSize * rows, squareSize * cols);
     game = new Tree(1);
+    frameRate(60);
     noLoop();
-    System.out.printf("setup complete%n");
-    redraw();
 }
 
 void draw()
 {
-    System.out.printf("redrawing...%n");
     build = new Thread(game);
     build.start();
 
-    background(0, 150, 0);
-    int parts = rows;
-    for (int count = 1; count <= parts - 1; count++)
-	{
-	    line(count * width / parts, height, count * width / parts, 0);
-	    line(0, count * height / parts, width, count * height / parts);
-	}
+    drawBG();
+    drawPieces();
+}
 
-    for (int row = 0; row < rows; row++)
+void drawBG()
+{
+    background(0, 150, 0);
+    for (int count = 1; count <= rows - 1; count++)
+	    line(count * width / rows, height, 
+		 count * width / rows, 0);
+    for (int count = 1; count <= cols - 1; count++)
+	    line(0,     count * height / cols, 
+		 width, count * height / cols);
+}
+
+void drawPieces()
+{
+   for (int row = 0; row < rows; row++)
 	{for (int col = 0; col < cols; col++)
 		{
 		    if (game.check(row, col) == -1)
@@ -41,7 +47,6 @@ void draw()
 		    ellipse(squareSize * row + squareSize / 2, squareSize * col + squareSize / 2, squareSize - 10, squareSize - 10);
 		}
 	}
-    System.out.printf("done redrawing%n");
 }
 
 void mouseClicked()
@@ -49,27 +54,22 @@ void mouseClicked()
     int row = mouseX / squareSize;
     int col = mouseY / squareSize;
     round(new Move(row, col));
-    redraw();
     if (game.AIPlayer() == game.currPlayer())
 	{
 	    System.out.printf("AI:%n");
 	    round(null);
-	    redraw();
 	}
 }
 
 void round(Move move)
 {
-    System.out.printf("playing...%n", move);
+    loop();
     try 
 	{
 	    build.join(500);
 	} 
-    catch (InterruptedException e) 
-	{
-	    System.out.println("interrupted");
-	}
+    catch (InterruptedException e) {}
     build.interrupt();
     game.play(move);
-    System.out.printf("done playing%n");
+    noLoop();
 }
