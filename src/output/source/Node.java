@@ -62,12 +62,6 @@ public class Node implements Comparable<Node>, Runnable
     {
 	return children != null;
     }
-    
-    public int size()
-    {
-	if (!initialized()) init();
-	return children.size();
-    }
 
     public Node find(Move move)
     {
@@ -95,20 +89,31 @@ public class Node implements Comparable<Node>, Runnable
 
     public void run()
     {
-	while (Runtime.getRuntime().freeMemory() > 1000 * 100 &&
-	       !Thread.interrupted())
+	try
 	    {
-		if (!initialized()) { init(); return; }
-		if (Thread.interrupted()) return;
-		for (Node child : children)
+		while (!Thread.interrupted())
 		    {
-			try
+			Runtime.getRuntime().gc();
+			if (!initialized()) { init(); continue; }
+			for (Node child : children)
 			    {
 				Thread curr = new Thread(child, child.getLast().toString());
 				curr.start();
+				if (Thread.interrupted())
+				    {
+					curr.interrupt();
+					return;
+				    }
 			    }
-			catch (OutOfMemoryError e) {return;}
 		    }
+	    }
+	catch (OutOfMemoryError e)
+	    {
+		return;
+	    }
+	catch (ConcurrentModificationException e)
+	    {
+		return;
 	    }
     }
 
@@ -164,6 +169,19 @@ public class Node implements Comparable<Node>, Runnable
 	return score;
     }
 
+    public int compareTo(Node that)
+    {
+	if (that == null)
+	    {
+		return Integer.MIN_VALUE;
+	    }
+
+	if (this.getPlayer() == that.getPlayer())
+	    return player * (this.branchScore() - that.branchScore());
+	else
+	    throw new IllegalArgumentException("Player no. does not match");
+    }
+
     //================================================================
 
     //PLAYER INFO
@@ -191,19 +209,6 @@ public class Node implements Comparable<Node>, Runnable
 				      //branchScore(),
 				      board.toString());
 	return output;
-    }
-
-    public int compareTo(Node that)
-    {
-	if (that == null)
-	    {
-		return Integer.MIN_VALUE;
-	    }
-
-	if (this.getPlayer() == that.getPlayer())
-	    return player * (this.branchScore() - that.branchScore());
-	else
-	    throw new IllegalArgumentException("Player no. does not match");
     }
 
 }
