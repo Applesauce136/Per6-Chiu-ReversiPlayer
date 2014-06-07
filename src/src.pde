@@ -56,7 +56,6 @@ void mouseClicked()
     round(new Move(row, col));
     if (game.AIPlayer() == game.currPlayer())
 	{
-	    System.out.printf("AI:%n");
 	    round(null);
 	}
 }
