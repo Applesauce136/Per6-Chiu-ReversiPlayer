@@ -91,24 +91,30 @@ public class Node implements Comparable<Node>, Runnable
     {
 	try
 	    {
-		while (true)
+		if (!initialized()) init();
+		else 
 		    {
-			if (!initialized()) init();
-			else
+			Stack<Thread> currs = new Stack<Thread>();
+			for (Node child : children)
 			    {
-				for (Node child : children)
+				if (Thread.interrupted())
 				    {
-					if (Runtime.getRuntime().freeMemory() < 1000 * 5000) return;
-					Thread curr = new Thread(child, child.getLast().toString());
-					curr.start();
-					if (Thread.interrupted())
+					while (!currs.empty())
 					    {
-						curr.interrupt();
-						return;
+						System.out.print("i");
+						currs.pop().interrupt();
 					    }
+					return;
+				    }
+				else if (Runtime.getRuntime().totalMemory() - 
+					 Runtime.getRuntime().freeMemory() <= 
+					 10000000)
+				    {
+					currs.push(new Thread(child));
+					currs.peek().start();
 				    }
 			    }
-		     }
+		    }
 	    }
 	catch (OutOfMemoryError e)
 	    {

@@ -11,11 +11,13 @@ void setup()
     root = new Node();
     frameRate(60);
     noLoop();
+    redraw();
 }
 
 void draw()
 {
-    build = new Thread(root);
+    build = new Thread(new RunBuild(root));
+    System.gc();
     build.start();
 
     drawBG();
@@ -77,13 +79,50 @@ void round(Move move)
 	{
 	    root = root.best();
 	}
-    else
+    else if (root.find(move) != null)
 	{
-	    Node newroot = root.find(move);
-	    if (newroot != null)
-		{
-		    root = newroot;
-		    System.gc();
-		}
+	    root = root.find(move);
+	    System.gc();
 	}
+}
+
+void memStatus()
+{
+    long
+	T = Runtime.getRuntime().totalMemory(),
+	F = Runtime.getRuntime().freeMemory();
+
+    System.out.printf("T - F: %d bytes%n",
+		      T - F);
+}
+
+class RunBuild implements Runnable
+{
+
+    private Node temp;
+
+    public RunBuild(Node temp)
+    {
+	this.temp = temp;
+    }
+
+    public void run()
+    {
+	while (!Thread.interrupted())
+	    {
+		System.out.println("started");
+		Thread thing = new Thread(temp); 
+		thing.start();
+		try
+		    {
+			thing.join(0);
+		    }
+		catch (InterruptedException e)
+		    {
+			thing.interrupt();
+			return;
+		    }
+		thing.interrupt();
+	    }
+    }
 }
