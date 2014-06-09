@@ -110,7 +110,6 @@ class RunBuild implements Runnable
     {
 	while (!Thread.interrupted())
 	    {
-		System.out.println("started");
 		Thread thing = new Thread(temp); 
 		thing.start();
 		try
